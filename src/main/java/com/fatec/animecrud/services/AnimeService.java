@@ -57,4 +57,21 @@ public class AnimeService {
     public Optional<Anime> getAnimeById(Long id) {
         return animeRepository.findById(id);
     }
+
+    public AnimeDto updateAnime(Long id, AnimeDto animeDto) {
+        Anime anime = this.convertDtoToAnime(animeDto);
+        if(this.getAnimeById(id).isEmpty()){
+            return null;
+        }
+        return this.convertAnimeToDto(
+            this.save(
+                this.getAnimeById(id).get()
+                        .setDescription(animeDto.description())
+                        .setFinished(animeDto.finished())
+                        .setImage(animeDto.image())
+                        .setName(animeDto.name())
+                        .setNumberOfEpisodes(animeDto.numberOfEpisodes())
+            )
+        );
+    }
 }
