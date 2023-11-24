@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public record AnimeDto(
+        Long id,
         @NotNull(message = "Name can't be empty.")
         String name,
         @NotNull(message = "Description can't be empty.")
