@@ -24,6 +24,39 @@ public class AnimeController {
         this.animeService = animeService;
     }
 
+    @GetMapping
+    public ResponseEntity<Response<List<AnimeDto>>> getAllAnimes() {
+        Response<List<AnimeDto>> response = new Response<>();
+        List<AnimeDto> animes = animeService.getAllAnimes();
+        response.setData(animes);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Response<AnimeDto>> getAnime(@PathVariable Long id) {
+        Response<AnimeDto> response = new Response<>();
+        Optional<Anime> anime = animeService.getAnimeById(id);
+        if(anime.isEmpty()){
+            response.getErrors().add("Anime não encontrado!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        response.setData(animeService.convertAnimeToDto(anime.get()));
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Response<AnimeDto>> postAnime(@PathVariable Long id, @Valid @RequestBody AnimeDto animeDto, BindingResult result){
+        Response<AnimeDto> response = new Response<>();
+        if(result.hasErrors()){
+            result.getAllErrors().forEach(i -> response.getErrors().add(i.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(response);
+        }
+        response.setData(
+                animeService.updateAnime(id, animeDto)
+        );
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping
     public ResponseEntity<Response<AnimeDto>> postAnime(@Valid @RequestBody AnimeDto animeDto, BindingResult result){
         Response<AnimeDto> response = new Response<>();
@@ -48,25 +81,6 @@ public class AnimeController {
         }
         animeService.delete(id);
         response.setData("Anime removido com sucesso");
-        return ResponseEntity.ok(response);
-    }
-    @GetMapping
-    public ResponseEntity<Response<List<AnimeDto>>> getAllAnimes() {
-        Response<List<AnimeDto>> response = new Response<>();
-        List<AnimeDto> animes = animeService.getAllAnimes();
-        response.setData(animes);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Response<AnimeDto>> getAnime(@PathVariable Long id) {
-        Response<AnimeDto> response = new Response<>();
-        Optional<Anime> anime = animeService.getAnimeById(id);
-        if(anime.isEmpty()){
-            response.getErrors().add("Anime não encontrado!");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-        response.setData(animeService.convertAnimeToDto(anime.get()));
         return ResponseEntity.ok(response);
     }
 }
